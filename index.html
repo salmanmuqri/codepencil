@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Code Editor</title>
+    <style>
+        :root {
+
+            --bg-primary: #f4f4f4;
+            --bg-secondary: #ffffff;
+            --text-primary: #333;
+            --accent-primary: #6a5acd;
+            --accent-secondary: #4a4a6a;
+
+            --dark-bg-primary: #1e1e2f;
+            --dark-bg-secondary: #2c2c3e;
+            --dark-text-primary: #e0e0e0;
+            --dark-accent-primary: #8a4fff;
+            --dark-accent-secondary: #6a5acd;
+        }
+
+        * {
+
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s;
+
+        }
+
+        body {
+
+            font-family: 'Arial', sans-serif;
+            height: 100vh;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+
+        }
+
+        body.dark-mode {
+
+            background-color: var(--dark-bg-primary);
+            color: var(--dark-text-primary);
+
+        }
+
+        .controls {
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background-color: var(--bg-secondary);
+
+        }
+
+        body.dark-mode .controls {
+
+            background-color: var(--dark-bg-secondary);
+
+        }
+
+        .code-editor {
+
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            height: calc(100vh - 100px);
+            gap: 10px;
+            padding: 10px;
+
+        }
+
+        .code {
+
+            display: grid;
+            grid-template-rows: repeat(3, 1fr);
+            gap: 10px;
+            background-color: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 10px;
+            overflow: hidden;
+
+        }
+
+        body.dark-mode .code {
+
+            background-color: var(--dark-bg-secondary);
+
+        }
+
+        .code-section {
+
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-primary);
+            border-radius: 8px;
+            overflow: hidden;
+
+        }
+
+        body.dark-mode .code-section {
+
+            background-color: var(--dark-bg-primary);
+
+        }
+
+        .code-section h1 {
+
+            background-color: var(--accent-primary);
+            color: white;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            margin: 0;
+
+        }
+
+        body.dark-mode .code-section h1 {
+
+            background-color: var(--dark-accent-primary);
+
+        }
+
+        .code-section h1 img {
+
+            width: 24px;
+            margin-right: 10px;
+
+        }
+
+        textarea {
+
+            flex-grow: 1;
+            width: 100%;
+            border: none;
+            padding: 10px;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            resize: none;
+            font-family: monospace;
+
+        }
+
+        body.dark-mode textarea {
+
+            background-color: var(--dark-bg-secondary);
+            color: var(--dark-text-primary);
+
+        }
+
+        #result {
+
+            width: 100%;
+            height: 100%;
+            border: 1px solid var(--accent-primary);
+            background-color: white;
+
+        }
+
+        .mode-toggle {
+
+            display: flex;
+            align-items: center;
+
+        }
+
+        .mode-toggle label {
+
+            margin-left: 10px;
+            cursor: pointer;
+
+        }
+
+        .run-btn {
+
+            background-color: var(--accent-primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+
+        }
+
+        body.dark-mode .run-btn {
+            
+            background-color: var(--dark-accent-primary);
+            
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <div class="mode-toggle">
+            <input type="checkbox" id="darkModeToggle">
+            <label for="darkModeToggle">Dark Mode</label>
+        </div>
+        <button class="run-btn" id="runBtn">Run Code</button>
+    </div>
+
+    <div class="code-editor">
+        <div class="code">
+            <div class="code-section html-code">
+                <h1><img src="images/html.png" alt="">HTML</h1>
+                <textarea id="html-code" spellcheck="false"></textarea>
+            </div>
+            <div class="code-section css-code">
+                <h1><img src="images/CSS.png" alt="">CSS</h1>
+                <textarea id="css-code" spellcheck="false"></textarea>
+            </div>
+            <div class="code-section js-code">
+                <h1><img src="images/js.png" alt="">JS</h1>
+                <textarea id="js-code" spellcheck="false"></textarea>
+            </div>
+        </div>
+        <iframe id="result"></iframe>
+    </div>
+
+    <script>
+
+const darkModeToggle = document.getElementById('darkModeToggle');
+        const body = document.body;
+
+        darkModeToggle.addEventListener('change', () => {
+            body.classList.toggle('dark-mode', darkModeToggle.checked);
+            localStorage.setItem('darkMode', darkModeToggle.checked);
+        });
+
+
+        if (localStorage.getItem('darkMode') === 'true') {
+            body.classList.add('dark-mode');
+            darkModeToggle.checked = true;
+        }
+
+
+        const html_code = document.getElementById('html-code');
+        const css_code = document.getElementById('css-code');
+        const js_code = document.getElementById('js-code');
+        const result = document.getElementById('result');
+        const runBtn = document.getElementById('runBtn');
+
+        function run() {
+            localStorage.setItem('html_code', html_code.value);
+            localStorage.setItem('css_code', css_code.value);
+            localStorage.setItem('js_code', js_code.value);
+
+            result.contentDocument.body.innerHTML = `<style>${localStorage.css_code}</style>` + localStorage.html_code;
+            result.contentWindow.eval(localStorage.js_code);
+        }
+
+        runBtn.addEventListener('click', run);
+
+        html_code.value = localStorage.getItem('html_code') || '';
+        css_code.value = localStorage.getItem('css_code') || '';
+        js_code.value = localStorage.getItem('js_code') || '';
+    </script>
+</body>
+</html>
